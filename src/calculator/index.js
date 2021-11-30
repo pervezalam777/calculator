@@ -77,6 +77,7 @@ export function processRawData(input) {
     result = segregatePerPerson(result);
     mergeRecordsWithAmount(result);
     mergeRecordsWithGK(result);
+    adjustContraEntries(result);
     extractAndAddAmountEntries(result);
     result = separateEntriesForGkOwnPaidReceived(result);
     console.log('result', result);
@@ -96,6 +97,7 @@ function extractEachRecords(input) {
     const regexForRecordsExtraction = /\[[^\n].*/gmi
     return input.match(regexForRecordsExtraction)
 }
+
 
 function segregatePerPerson(input) {
     return input.reduce((finalResult, nextRow) => {
@@ -152,7 +154,8 @@ function mergeRecordsWithGK(input) {
                 j -= 1;
                 const previousEntry = entries[j];
                 const noGK = shouldNotHaveGK(previousEntry.description);
-                if(noGK) {
+                const hasAmount = getAmount(previousEntry.description)
+                if(noGK && hasAmount > 0) {
                     previousEntry.description += ' GK';
                     entry.markForDeletion = true;
                     break;
@@ -172,14 +175,6 @@ function shouldNotHaveGK(value) {
     return !regexForGK.test(value);
 }
 
-function extractAndAddAmountEntries(input) {
-    Object.values(input).forEach(entries => {
-        entries.forEach(entry => {
-            entry.amount = getAmount(entry.description)
-        })
-    })
-}
-
 function getAmount(value) {
     const regexForAmount = /\d+/g;
     const result = value.match(regexForAmount)
@@ -188,6 +183,58 @@ function getAmount(value) {
     }
     return 0
 }
+
+function adjustContraEntries(input) {
+    Object.values(input).forEach(entries => {
+        let len = entries.length;
+        const partOfContraEntries = [];
+        for(let i = 0; i < len; i++) {
+            const entry = entries[i];
+            const { description } = entry;
+            const contraObject = hasContraEntry(description);
+            if(contraObject.isContraEntry) {
+                // ['', ' milk and egg ', ' recieved']
+                // TODO: Revise following logic later
+                var splitDes = description.split(contraObject.amounts[0])
+                entry.description = `${splitDes[1]} ${contraObject.amounts[0]} contra**`
+                entry.contra = true;
+                partOfContraEntries.push({
+                    ...entry,
+                    description: `${splitDes[2]} ${contraObject.amounts[0]} contra**`,
+                    contra: true
+                })
+            }
+        }
+        entries.push(...partOfContraEntries);
+    })
+}
+
+function hasContraEntry(value) {
+    const regexForAmount = /\d+/g;
+    const result = value.match(regexForAmount);
+    const hasReceivedKeyword = containsReceived(value);
+    // NOTE: this logic may require refinement if
+    // it has multiple contra entries in single statement
+    if(result && result.length % 2 === 0 && hasReceivedKeyword){
+        return { isContraEntry:true, amounts:result }
+    }
+    return { isContraEntry: false, amounts: [] }
+}
+
+function containsReceived(value) {
+    const regexForReceived = /rec(ei|ie)ved/gi;
+    return regexForReceived.test(value);
+}
+
+function extractAndAddAmountEntries(input) {
+    Object.values(input).forEach(entries => {
+        entries.forEach(entry => {
+            entry.amount = getAmount(entry.description)
+        })
+    })
+}
+
+
 
 function separateEntriesForGkOwnPaidReceived(input){
     const finalResult = {}
@@ -213,11 +260,6 @@ function separateEntriesForGkOwnPaidReceived(input){
 function containsGgInText(value) {
     const regexForGK = /gk/i
     return regexForGK.test(value);
-}
-
-function containsReceived(value) {
-    const regexForReceived = /rec(ei|ie)ved/gi;
-    return regexForReceived.test(value);
 }
 
 function containsPaid(value) {
