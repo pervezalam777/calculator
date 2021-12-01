@@ -3,10 +3,10 @@
 Egg
 Fruit
 Vegetable
-[7:52 pm, 11/11/2021] Nafees: Deemak ka tail 350
+[7:53 pm, 11/11/2021] Nafees: Deemak ka tail 350
 [7:53 pm, 11/11/2021] Nafees: Vegetables 250
 [7:55 pm, 11/11/2021] Nafees: Vineger brown and white, butter and refind oil = 280
-[8:28 pm, 11/11/2021] Nafees: Ghee 400~
+[8:29 pm, 11/11/2021] Nafees: Ghee 400~
 [8:05 am, 12/11/2021] Pervez Alam: Deemak tail, matti ka tail 440
 [11:52 am, 12/11/2021] Pervez Alam: Chicken 560
 [0:03 pm, 12/11/2021] Amreen: 1000
@@ -69,3 +69,7 @@ GK
 240 biryani
 [11:42 am, 30/11/2021] Amreen: 500 milk Gk
 [11:42 am, 30/11/2021] Amreen: 65 aalu began Gk
+[8:32 pm, 30/11/2021] Pervez Alam: 208 milk 50 banana
+[9:43 am, 01/12/2021] Amreen: 50 onion Gk
+[1:22 pm, 01/12/2021] Nafees: 500 chicken or nashta
+[1:22 pm, 01/12/2021] Nafees: Gk
