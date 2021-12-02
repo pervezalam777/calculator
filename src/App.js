@@ -1,12 +1,14 @@
 import {useRef, useState} from 'react'
+import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 
 import * as aiCalculator from './calculator'
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import './App.css';
 
 function App() {
   const areaRef = useRef();
   const [processed, setProcessed] = useState(false);
-  //const [person, setPerson] = useState('');
   const [value, setValue] = useState(-1);
 
   const handleClick = () => {
@@ -14,21 +16,10 @@ function App() {
     setProcessed(processed);
   }
 
-  // const onChangeValue = (event) => {
-  //   const method = event.target.value;
-  //   const result = aiCalculator[method](person);
-  //   setValue(`${method}: ${result}`)
-  // }
-
   const handleTotalHouseExpense = () => {
     const result = aiCalculator.totalHouseExpense()
     setValue(`Total House expense ${result}`);
   }
-
-  // const onPersonSelectionChange = (event) => {
-  //   const name = event.target.value;
-  //   setPerson(name);
-  // }
 
   function renderOptions() {
     if(processed) {
@@ -69,30 +60,6 @@ function App() {
             }
           </tbody>
         </table>
-        {/* <div>
-          <h4>Select name </h4>
-          <ul onChange={onPersonSelectionChange}>
-            {
-              aiCalculator.getPersonList().map(name => (
-                <li key={name}>
-                  <input type="radio" value={name} name="person" /> {name}
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-        <div onChange={onChangeValue}>
-          <h4> Select option </h4>
-          <div>
-            <input type="radio" value="paidFromOwnPocket" name="option" /> Paid From Own Pocket
-          </div>
-          <div>
-            <input type="radio" value="paidBy" name="option" /> Paid By
-          </div>
-          <div>
-            <input type="radio" value="receivedBy" name="option" /> Received By
-          </div>
-        </div> */}
       </>
      
     )
@@ -103,30 +70,16 @@ function App() {
     console.log('tabular result', result);
     if(result.length > 0){
       return (
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Payment Mode</th>
-              <th>Amount</th>
-              <th>Description</th>
-              <th>date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              result.map((tuple, index) => (
-                <tr key={index}>
-                  <td>{tuple.by}</td>
-                  <td>{tuple.paymentMode}</td>
-                  <td>{tuple.amount}</td>
-                  <td>{tuple.description}</td>
-                  <td>{tuple.date}</td>
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
+        <div className="ag-theme-alpine" style={{height: 400, width: '100%'}}>
+           <AgGridReact
+               rowData={result}>
+               <AgGridColumn field="by" sortable={ true } filter={ true } ></AgGridColumn>
+               <AgGridColumn field="paymentMode" sortable={ true } filter={ true }></AgGridColumn>
+               <AgGridColumn field="amount"></AgGridColumn>
+               <AgGridColumn field="description"></AgGridColumn>
+               <AgGridColumn field="date"></AgGridColumn>
+           </AgGridReact>
+        </div>
       )
     }
     return null;
